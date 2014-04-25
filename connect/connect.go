@@ -14,7 +14,7 @@ type Ping struct {
 }
 
 type Connection struct {
-  requests, threats, connections int
+  requests,  connections int
   url string
 }
 
@@ -57,11 +57,9 @@ func Blowpipe (c *Connection) {
   fmt.Printf("The average call took %f ms .\n", float64(timeA.Sub(timeB))/float64(c.requests)/float64(1000000))
 }
 
-func Establish (requests int, threats int, connections int, url string) {
-
+func Establish (requests int, connections int, url string) {
   c := &Connection{
     requests:     requests,
-    threats:      threats,
     connections:  connections,
     url:          url,
   }
