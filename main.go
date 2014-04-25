@@ -11,9 +11,9 @@ import (
 func main () {
   args := os.Args
 
-  requests := 1
-  threats := 1
-  connections := 1
+  requests    := 1
+  threats     := 1   // not used atm.
+  connections := 1   // not used atm.
   url := ""
 
   for _, element := range args {
