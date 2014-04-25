@@ -33,13 +33,32 @@ func pingURL (url string) *Ping {
   }
 }
 
-func Blowpipe (c *Connection) {
-  for i := 0; i < c.requests; i++ {
-    fmt.Println("FIRE THE BLOWPIPE")
+func BlowPing (url string, ch chan<- *Ping) {
+  p := pingURL(url)
+  if !p.bstatus {
+    fmt.Println("...wow, that last ping was bad!")
+  } else {
+    ch <- p
   }
 }
 
+func Blowpipe (c *Connection) {
+  blowpipeChan := make(chan *Ping)
+  for i := 0; i < c.requests; i++ {
+    go BlowPing(c.url, blowpipeChan)
+  }
+  p := &Ping{time: time.Second, status: 200, bstatus: true}
+  timeA := time.Now()
+  timeB := time.Now()
+  for i := 0; i < c.requests; i++ {
+    p = <-blowpipeChan
+    timeA = timeA.Add(p.time)
+  }
+  fmt.Printf("The average call took %f ms .\n", float64(timeA.Sub(timeB))/float64(c.requests)/float64(1000000))
+}
+
 func Establish (requests int, threats int, connections int, url string) {
+
   c := &Connection{
     requests:     requests,
     threats:      threats,
