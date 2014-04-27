@@ -5,6 +5,8 @@ import (
   "time"
   "os"
   "net/http"
+  "log"
+  "io/ioutil"
 )
 
 type Ping struct {
@@ -22,9 +24,15 @@ func pingURL (url string) *Ping {
   t0 := time.Now()
   response, err := http.Get(url)
   if err != nil {
-    fmt.Printf("NO SUCH URL?\n")
+    log.Fatal(err)
+    fmt.Println("-----------------")
+    fmt.Printf("\nNO SUCH URL?\n")
     os.Exit(1)
   }
+  defer response.Body.Close()
+  body, err := ioutil.ReadAll(response.Body)
+  fmt.Println(len(body))
+  body = nil
   t1 := time.Now()
   return &Ping{
     time:     t1.Sub(t0),
@@ -34,12 +42,7 @@ func pingURL (url string) *Ping {
 }
 
 func BlowPing (url string, ch chan<- *Ping) {
-  p := pingURL(url)
-  if !p.bstatus {
-    fmt.Println("...wow, that last ping was bad!")
-  } else {
-    ch <- p
-  }
+  ch <- pingURL(url)
 }
 
 func Blowpipe (c *Connection) {

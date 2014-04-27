@@ -5,6 +5,10 @@ var to = setTimeout(reset, 1000)
 var connections = 0
 
 function responseResult (res, block) {
+  res.write('i\'ll write some data\n')
+  for (var i = 0; i < _c; i++) {
+    res.write('...and some more data\n')
+  }
   setTimeout(function () {
     connections--
     res.end('Hello World\n')
@@ -20,7 +24,6 @@ http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   var b = Math.random()*1000*(1+_c/10)
   responseResult(res, b)
-
   console.log(++_c)
 }).listen(1337, '127.0.0.1');
 
