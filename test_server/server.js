@@ -1,17 +1,14 @@
-var http = require('http');
+var http = require('http'), fs = require('fs');
 var _c = 0;
 function reset () { _c = 0; console.log('\n----------') }
 var to = setTimeout(reset, 1000)
 var connections = 0
 
 function responseResult (res, block) {
-  res.write('i\'ll write some data\n')
-  for (var i = 0; i < _c; i++) {
-    res.write('...and some more data\n')
-  }
   setTimeout(function () {
+    fs.createReadStream('./faust.txt').pipe(res)
     connections--
-    res.end('Hello World\n')
+
   }, block)
 }
 
@@ -22,7 +19,7 @@ http.createServer(function (req, res) {
   to = setTimeout(reset, 1000)
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  var b = Math.random()*1000*(1+_c/10)
+  var b = Math.random()*100*(1+_c/10)
   responseResult(res, b)
   console.log(++_c)
 }).listen(1337, '127.0.0.1');
