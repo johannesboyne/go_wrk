@@ -9,6 +9,9 @@ import (
   "io/ioutil"
 )
 
+var kb = 0
+var gtimeA = time.Now()
+
 type Ping struct {
   time time.Duration
   status int
@@ -16,7 +19,7 @@ type Ping struct {
 }
 
 type Connection struct {
-  requests,  connections int
+  requests int
   url string
 }
 
@@ -31,7 +34,8 @@ func pingURL (url string) *Ping {
   }
   defer response.Body.Close()
   body, err := ioutil.ReadAll(response.Body)
-  fmt.Println(len(body))
+  kb += len(body)/1000
+  // freeing the allocation for the GC
   body = nil
   t1 := time.Now()
   return &Ping{
@@ -57,13 +61,15 @@ func Blowpipe (c *Connection) {
     p = <-blowpipeChan
     timeA = timeA.Add(p.time)
   }
+
   fmt.Printf("The average call took %f ms .\n", float64(timeA.Sub(timeB))/float64(c.requests)/float64(1000000))
+  fmt.Printf("Time used %v.\n", time.Now().Sub(gtimeA))
+  fmt.Printf("And %d kb were transmitted\n", kb)
 }
 
-func Establish (requests int, connections int, url string) {
+func Establish (requests int, url string) {
   c := &Connection{
     requests:     requests,
-    connections:  connections,
     url:          url,
   }
   fmt.Printf("Establish Connection to: %s\n", c.url)
